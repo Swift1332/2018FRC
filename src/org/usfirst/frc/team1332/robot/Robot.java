@@ -7,6 +7,8 @@
 
 package org.usfirst.frc.team1332.robot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -75,6 +77,9 @@ public class Robot extends TimedRobot {
 		
 		ss_pickup = new Pickup();
 		
+		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+		camera.setResolution(640, 480);
+		
 		sc_frontLeftDrive = new Spark(RobotMap.p_frontLeftDriveChannel);
 		sc_frontRightDrive = new Spark(RobotMap.p_frontRightDriveChannel);
 		sc_rearLeftDrive = new Spark(RobotMap.p_rearLeftDriveChannel);
@@ -89,7 +94,7 @@ public class Robot extends TimedRobot {
 		sc_primaryElevator.setInverted(true);
 		
 		sc_secondaryElevator = new VictorSP(RobotMap.p_elevatorSecondaryStageChannel);
-		sc_secondaryElevator.setInverted(true);
+		//sc_secondaryElevator.setInverted(true);
 		
 		sc_leftPickup = new VictorSP(RobotMap.p_leftArmPickupChannel);
 		sc_rightPickup = new VictorSP(RobotMap.p_rightArmPickupChannel);
