@@ -43,8 +43,8 @@ public class Robot extends TimedRobot {
 	Spark sc_rearRightDrive;
 	Spark sc_primaryElevator;
 	VictorSP sc_secondaryElevator;
-	VictorSP sc_leftPickup;
-	VictorSP sc_rightPickup;
+	public VictorSP sc_leftPickup;
+	public VictorSP sc_rightPickup;
 	
 	SpeedControllerGroup scg_leftDrive;
 	SpeedControllerGroup scg_rightDrive;	
@@ -211,7 +211,7 @@ public class Robot extends TimedRobot {
 
 		double primaryElevatorInput = m_oi.c_joystickSecondary.getY();
 		double secondaryElevatorInput = m_oi.c_joystickSecondary.getRawAxis(3);
-		System.out.println("Secondary Stick: " + secondaryElevatorInput);
+		//System.out.println("Secondary Stick: " + secondaryElevatorInput);
 		
 		if (l_elevatorPrimaryUpper.get() || l_elevatorPrimaryLower.get()) 
 		{
