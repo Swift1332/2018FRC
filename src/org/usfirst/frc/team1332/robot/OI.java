@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1332.robot;
 
 import org.usfirst.frc.team1332.robot.commands.EjectCube;
+import org.usfirst.frc.team1332.robot.commands.HoldCube;
 import org.usfirst.frc.team1332.robot.commands.PickupCube;
 import org.usfirst.frc.team1332.robot.commands.StopPickup;
 import edu.wpi.first.wpilibj.Joystick;
@@ -51,6 +52,7 @@ public class OI {
 	public Joystick c_joystickSecondary;
 	JoystickButton b_pickupCubeButton;
 	JoystickButton b_ejectCubeButton;
+	JoystickButton b_holdCubeButton;
 	
 	public OI(){
 		c_joystickPrimary = new Joystick(0);
@@ -58,11 +60,16 @@ public class OI {
 		
 		b_pickupCubeButton = new JoystickButton(c_joystickSecondary, 7);
 		b_ejectCubeButton = new JoystickButton(c_joystickSecondary, 8);
+		b_holdCubeButton = new JoystickButton(c_joystickSecondary, 6);
 				
 		
 		b_pickupCubeButton.whenPressed(new PickupCube());
 		b_ejectCubeButton.whenPressed(new EjectCube());
+		b_holdCubeButton.whenPressed(new HoldCube());
+		
 		b_pickupCubeButton.whenReleased(new StopPickup());
 		b_ejectCubeButton.whenReleased(new StopPickup());
+		b_holdCubeButton.whenReleased(new StopPickup());
+		
 	}
 }

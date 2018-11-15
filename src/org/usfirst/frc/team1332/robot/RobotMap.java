@@ -1,4 +1,5 @@
 /*----------------------------------------------------------------------------*/
+
 /* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
@@ -25,7 +26,7 @@ public class RobotMap {
 	// public static int rangefinderModule = 1;
 	
 	//PWM
-	public static int p_elevatorPrimaryStageChannel = 0;
+	public static int p_elevatorPrimaryStageChannel = 8;
 	public static int p_frontLeftDriveChannel = 1;
 	public static int p_rearLeftDriveChannel = 2;
 	public static int p_frontRightDriveChannel = 3;
@@ -33,6 +34,7 @@ public class RobotMap {
 	public static int p_leftArmPickupChannel = 5;
 	public static int p_rightArmPickupChannel = 6;
 	public static int p_elevatorSecondaryStageChannel = 7;
+	public static int p_cameraServoChannel = 9;
 	
 	//DIO
 	public static int d_elevatorPrimaryEncoderBChannel = 0;

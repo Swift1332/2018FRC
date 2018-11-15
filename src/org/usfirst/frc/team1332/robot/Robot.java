@@ -7,20 +7,23 @@
 
 package org.usfirst.frc.team1332.robot;
 
+import org.usfirst.frc.team1332.robot.components.ADigitalInput;
+import org.usfirst.frc.team1332.robot.subsystems.Pickup;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.usfirst.frc.team1332.robot.components.ADigitalInput;
-import org.usfirst.frc.team1332.robot.subsystems.Pickup;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -35,6 +38,8 @@ public class Robot extends TimedRobot {
 	public static Robot robot;
 	
 	public Pickup ss_pickup;
+	
+	private Timer timer = new Timer();
 
 	
 	Spark sc_frontLeftDrive;
@@ -45,6 +50,8 @@ public class Robot extends TimedRobot {
 	VictorSP sc_secondaryElevator;
 	public VictorSP sc_leftPickup;
 	public VictorSP sc_rightPickup;
+	
+	public Servo cameraServo;
 	
 	SpeedControllerGroup scg_leftDrive;
 	SpeedControllerGroup scg_rightDrive;	
@@ -85,6 +92,8 @@ public class Robot extends TimedRobot {
 		sc_rearLeftDrive = new Spark(RobotMap.p_rearLeftDriveChannel);
 		sc_rearRightDrive = new Spark(RobotMap.p_rearRightDriveChannel);
 		
+		cameraServo = new Servo(RobotMap.p_cameraServoChannel);
+		
 		scg_leftDrive = new SpeedControllerGroup(sc_frontLeftDrive, sc_rearLeftDrive);
 		scg_rightDrive = new SpeedControllerGroup(sc_frontRightDrive, sc_rearRightDrive);
 		
@@ -94,7 +103,7 @@ public class Robot extends TimedRobot {
 		sc_primaryElevator.setInverted(true);
 		
 		sc_secondaryElevator = new VictorSP(RobotMap.p_elevatorSecondaryStageChannel);
-		//sc_secondaryElevator.setInverted(true);
+		sc_secondaryElevator.setInverted(true);
 		
 		sc_leftPickup = new VictorSP(RobotMap.p_leftArmPickupChannel);
 		sc_rightPickup = new VictorSP(RobotMap.p_rightArmPickupChannel);
@@ -112,7 +121,7 @@ public class Robot extends TimedRobot {
 		l_elevatorSecondaryLower =  new ADigitalInput(RobotMap.a_elevatorSecondaryLowerLimitChannel);
 	}
 	
-	public void alwaysPeriodic() {
+	public void robotPeriodic() {
 		SmartDashboard.putNumber("Primary Elevator Encoder", enc_elevatorPrimary.get());
 		SmartDashboard.putNumber("Secondary Elevator Encoder", enc_elevatorSecondary.get());
 		SmartDashboard.putNumber("Right Drive Encoder", enc_rightDrive.get());
@@ -122,12 +131,6 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putBoolean("Primary Elevator Lower Limit", l_elevatorPrimaryLower.get());
 		SmartDashboard.putBoolean("Secondary Elevator Upper Limit", l_elevatorSecondaryUpper.get());
 		SmartDashboard.putBoolean("Secondary Elevator Lower Limit", l_elevatorSecondaryLower.get());
-		/*
-		SmartDashboard.putNumber("Primary Elevator Upper Limit V", l_elevatorPrimaryUpper.getValue());
-		SmartDashboard.putNumber("Primary Elevator Lower Limit V", l_elevatorPrimaryLower.getValue());
-		SmartDashboard.putNumber("Secondary Elevator Upper Limit V", l_elevatorSecondaryUpper.getValue());
-		SmartDashboard.putNumber("Secondary Elevator Lower Limit V", l_elevatorSecondaryLower.getValue());
-		*/
 	}
 
 	/**
@@ -142,7 +145,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledPeriodic() {
-		alwaysPeriodic();
 		Scheduler.getInstance().run();
 	}
 
@@ -172,6 +174,9 @@ public class Robot extends TimedRobot {
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.start();
 		}
+		
+		
+		timer.start();
 	}
 
 	/**
@@ -179,6 +184,30 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		double startTime = 10.0;
+		double endTime = 12.5;
+		double autoSpeed = 0.5;
+		
+		if (timer.get() < startTime)
+		{
+			// do nothing
+			sc_frontLeftDrive.set(0);
+			sc_frontRightDrive.set(0);
+			sc_rearLeftDrive.set(0);
+			sc_rearRightDrive.set(0);
+		}
+		else if (timer.get() < endTime) {			
+			sc_frontLeftDrive.set(-autoSpeed);
+			sc_frontRightDrive.set(autoSpeed);
+			sc_rearLeftDrive.set(-autoSpeed);
+			sc_rearRightDrive.set(autoSpeed);
+		} else {
+			sc_frontLeftDrive.set(0);
+			sc_frontRightDrive.set(0);
+			sc_rearLeftDrive.set(0);
+			sc_rearRightDrive.set(0);
+		}
+		
 		Scheduler.getInstance().run();
 	}
 
@@ -191,6 +220,8 @@ public class Robot extends TimedRobot {
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.cancel();
 		}
+		
+		cameraServo.set(0.3372222);
 	}
 
 	/**
@@ -213,13 +244,15 @@ public class Robot extends TimedRobot {
 		double secondaryElevatorInput = m_oi.c_joystickSecondary.getRawAxis(3);
 		//System.out.println("Secondary Stick: " + secondaryElevatorInput);
 		
-		if (l_elevatorPrimaryUpper.get() || l_elevatorPrimaryLower.get()) 
+		boolean limitSwitchOverride = m_oi.c_joystickPrimary.getRawButton(5);
+		
+		if (l_elevatorPrimaryUpper.get() || l_elevatorPrimaryLower.get() || limitSwitchOverride) 
 		{
-			if (l_elevatorPrimaryUpper.get() && primaryElevatorInput >= 0)
+			if ((l_elevatorPrimaryUpper.get() && primaryElevatorInput >= 0) || limitSwitchOverride)
 			{
 				sc_primaryElevator.set(primaryElevatorInput);				
 			}
-			else if (l_elevatorPrimaryLower.get() && primaryElevatorInput <= 0)
+			else if ((l_elevatorPrimaryLower.get() && primaryElevatorInput <= 0) || limitSwitchOverride)
 			{
 				sc_primaryElevator.set(primaryElevatorInput);
 			}
@@ -236,13 +269,13 @@ public class Robot extends TimedRobot {
 		}
 		
 		
-		if (l_elevatorSecondaryUpper.get() || l_elevatorSecondaryLower.get()) 
+		if ((l_elevatorSecondaryUpper.get() || l_elevatorSecondaryLower.get()) || limitSwitchOverride)
 		{
-			if (l_elevatorSecondaryUpper.get() && secondaryElevatorInput >= 0)
+			if ((l_elevatorSecondaryUpper.get() && secondaryElevatorInput >= 0) || limitSwitchOverride)
 			{
 				sc_secondaryElevator.set(secondaryElevatorInput);				
 			}
-			else if (l_elevatorSecondaryLower.get() && secondaryElevatorInput <= 0)
+			else if ((l_elevatorSecondaryLower.get() && secondaryElevatorInput <= 0) || limitSwitchOverride)
 			{
 				sc_secondaryElevator.set(secondaryElevatorInput);
 			}
@@ -257,7 +290,16 @@ public class Robot extends TimedRobot {
 		{			
 			sc_secondaryElevator.set(secondaryElevatorInput);			
 		}
+		System.out.println(cameraServo.get());
+		if (m_oi.c_joystickSecondary.getRawButton(1))
+		{
+			cameraServo.set(cameraServo.get() + 0.01);
+		}
 		
+		if (m_oi.c_joystickSecondary.getRawButton(3))
+		{
+			cameraServo.set(cameraServo.get() - 0.01);
+		}
 		
 		Scheduler.getInstance().run();
 	}

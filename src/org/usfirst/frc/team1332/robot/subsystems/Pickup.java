@@ -30,5 +30,9 @@ public class Pickup extends Subsystem {
     	runPickup(speed, speed * 0.5);    	
     }
     
+    public void hold() {
+    	runPickup(0.3, 0.3);    	
+    }
+    
 }
 
